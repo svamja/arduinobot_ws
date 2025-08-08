@@ -3,31 +3,37 @@ from rclpy.node import Node
 from rcl_interfaces.msg import SetParametersResult
 from rclpy.parameter import Parameter
 
-class SimpleParameter(Node):
 
+class SimpleParameter(Node):
+    
     def __init__(self):
         super().__init__("simple_parameter")
-        self.declare_parameter("my_yaw", 1.2)
-        self.declare_parameter("my_pitch", 45)
-        self.declare_parameter("my_color", "blue")
-        self.add_on_set_parameters_callback(self.changeParamCallback)
+        self.declare_parameter("simple_int_param", 28)
+        self.declare_parameter("simple_string_param", "Antonio")
 
-    
-    def changeParamCallback(self, params):
+        self.add_on_set_parameters_callback(self.paramChangeCallback)
+
+    def paramChangeCallback(self, params):
         result = SetParametersResult()
-        result.successful = True
 
         for param in params:
-            self.get_logger().info("param %s changed. new value = %s" % (param.name, param.value))
+
+            if param.name == "simple_int_param" and param.type_ == Parameter.Type.INTEGER:
+                self.get_logger().info("Param simple_int_param changed! New value is %d" % param.value)
+                result.successful = True
+
+            if param.name == "simple_string_param" and param.type_ == Parameter.Type.STRING:
+                self.get_logger().info("Param simple_string_param changed! New value is %s" % param.value)
+                result.successful = True 
 
         return result
-    
+
 
 def main():
     rclpy.init()
-    my_node = SimpleParameter()
-    rclpy.spin(my_node)
-    my_node.destroy_node()
+    simple_parameter = SimpleParameter()
+    rclpy.spin(simple_parameter)
+    simple_parameter.destroy_node()
     rclpy.shutdown()
 
 
