@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from arduinobot_msgs import AddTwoInts
+from arduinobot_msgs.srv import AddTwoInts
 
 
 class SimpleServiceServer(Node):
@@ -12,6 +12,7 @@ class SimpleServiceServer(Node):
             "add_two_ints",
             self.handle_service_request
         )
+        self.get_logger().info("Service 'add_two_ints' is ready to receive requests.")
 
 
     def handle_service_request(self, request, response):
