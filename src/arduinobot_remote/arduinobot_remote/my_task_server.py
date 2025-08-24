@@ -12,6 +12,13 @@ class MyTaskServer(Node):
     def __init__(self):
         super().__init__("my_task_server")
         self.action_server = ActionServer(self, Fibonacci, "fibonacci", self.goalCallback)
+        
+        # Initialize MoveItPy once in the constructor
+        self.get_logger().info("Initializing MoveIt...")
+        self.arduinobot = MoveItPy(node_name='moveit_py')
+        self.arm = self.arduinobot.get_planning_component("arm")
+        self.gripper = self.arduinobot.get_planning_component("gripper")
+        
         self.get_logger().info("Action server 'fibonacci' is ready to receive requests.")
 
 
@@ -29,28 +36,25 @@ class MyTaskServer(Node):
         return result
 
     def move_robot(self):
-        arduinobot = MoveItPy(node_name='moveit_py')
-        arm = arduinobot.get_planning_component("arm")
-        gripper = arduinobot.get_planning_component("gripper")
-
-        arm_state = RobotState(arduinobot.get_robot_model())
-        gripper_state = RobotState(arduinobot.get_robot_model())
+        # Use the class instance variables instead of creating new ones
+        arm_state = RobotState(self.arduinobot.get_robot_model())
+        gripper_state = RobotState(self.arduinobot.get_robot_model())
 
         arm_state.set_joint_group_positions("arm", np.array([1.57, 0.0, 0.0]))
         gripper_state.set_joint_group_positions("gripper", np.array([-0.7, -0.7]))
 
-        arm.set_start_state_to_current_state()
-        gripper.set_start_state_to_current_state()
+        self.arm.set_start_state_to_current_state()
+        self.gripper.set_start_state_to_current_state()
 
-        arm.set_goal_state(robot_state=arm_state)
-        gripper.set_goal_state(robot_state=gripper_state)
+        self.arm.set_goal_state(robot_state=arm_state)
+        self.gripper.set_goal_state(robot_state=gripper_state)
 
-        arm_plan_result = arm.plan()
-        gripper_plan_result = gripper.plan()
+        arm_plan_result = self.arm.plan()
+        gripper_plan_result = self.gripper.plan()
 
         if arm_plan_result and gripper_plan_result:
-            arduinobot.execute(arm_plan_result.trajectory, controllers=[])
-            arduinobot.execute(gripper_plan_result.trajectory, controllers=[])
+            self.arduinobot.execute(arm_plan_result.trajectory, controllers=[])
+            self.arduinobot.execute(gripper_plan_result.trajectory, controllers=[])
         else:
             self.get_logger().error('Planning failed')
 
