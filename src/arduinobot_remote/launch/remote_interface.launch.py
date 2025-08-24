@@ -1,7 +1,6 @@
 import os
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.conditions import UnlessCondition, IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from moveit_configs_utils import MoveItConfigsBuilder
@@ -15,20 +14,7 @@ def generate_launch_description():
         default_value="True"
     )
 
-    use_python_arg = DeclareLaunchArgument(
-        "use_python",
-        default_value="False",
-    )
-
-    use_python = LaunchConfiguration("use_python")
     is_sim = LaunchConfiguration("is_sim")
-
-    task_server_node = Node(
-        package="arduinobot_remote",
-        executable="task_server_node",
-        condition=UnlessCondition(use_python),
-        parameters=[{"use_sim_time": is_sim}]
-    )
 
     moveit_config = (
         MoveItConfigsBuilder("arduinobot", package_name="arduinobot_moveit")
@@ -46,15 +32,14 @@ def generate_launch_description():
 
     task_server_node_py = Node(
         package="arduinobot_remote",
-        executable="task_server.py",
-        condition=IfCondition(use_python),
+        executable="task_server",
         parameters=[moveit_config.to_dict(),
                     {"use_sim_time": is_sim}]
     )
 
     return LaunchDescription([
-        use_python_arg,
+        # use_python_arg,
         is_sim_arg,
-        task_server_node,
+        # task_server_node,
         task_server_node_py,
     ])
