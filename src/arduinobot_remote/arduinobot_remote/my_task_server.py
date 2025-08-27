@@ -22,7 +22,7 @@ class MyTaskServer(Node):
 
 
     def goalCallback(self, goal_handle):
-        self.get_logger().info("Goal received")
+        self.get_logger().info("Goal received: %s" % goal_handle.request.task_number)
 
         self.get_logger().info("moving robot")
         task_number = goal_handle.request.task_number
