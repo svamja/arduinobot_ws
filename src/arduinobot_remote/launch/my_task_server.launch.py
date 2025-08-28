@@ -28,6 +28,13 @@ def generate_launch_description():
                     {"use_sim_time": True}]
     )
 
+    alexa_interface_node = Node(
+        package="arduinobot_remote",
+        executable="alexa_interface",
+        parameters=[{"use_sim_time": True}]
+    )
+
     return LaunchDescription([
         my_task_server_node,
+        alexa_interface_node
     ])

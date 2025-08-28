@@ -22,6 +22,7 @@ setup(
     entry_points={
         'console_scripts': [
             'my_task_server = arduinobot_remote.my_task_server:main',
+            'alexa_interface = arduinobot_remote.alexa_interface:main',
         ],
     },
 )
