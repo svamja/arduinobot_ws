@@ -13,7 +13,7 @@ import threading
 from rclpy.action import ActionClient
 
 threading.Thread(target=lambda: rclpy.init()).start()
-action_client = ActionClient(Node('alexa_interface'), ArduinobotTask, "task_server")
+action_client = ActionClient(Node('alexa_interface'), ArduinobotTask, "my_task_server")
 
 app = Flask(__name__)
 
@@ -32,6 +32,8 @@ class LaunchRequestHandler(AbstractRequestHandler):
             SimpleCard("Online", speech_text)).set_should_end_session(
             False)
 
+
+        action_client.wait_for_server()
         goal = ArduinobotTask.Goal()
         goal.task_number = 0
         action_client.send_goal_async(goal)
